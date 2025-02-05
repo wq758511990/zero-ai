@@ -1,0 +1,34 @@
+services:
+  mysql-container:
+    image: mysql
+    volumes:
+      - /Users/luckincoffee/volumes/mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: prisma_test
+      MYSQL_ROOT_PASSWORD: 123456
+    networks:
+      - common-network
+
+  redis-container:
+    image: redis
+    volumes:
+      - /Users/luckincoffee/volumes/redis-data:/data
+    networks:
+      - common-network
+
+  nest-base:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    depends_on:
+      - mysql-container
+      - redis-container
+    ports:
+      - 3000:3000
+    networks:
+      - common-network
+    restart: always
+
+networks:
+  common-network:
+    driver: bridge
