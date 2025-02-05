@@ -40,8 +40,7 @@ function ChatWindow() {
     },
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const sendMessage = () => {
     if (!input.trim()) return;
 
     // 添加用户消息
@@ -52,6 +51,8 @@ function ChatWindow() {
     try {
       // 创建新的AbortController用于中断请求
       controllerRef.current = new AbortController();
+
+      const { signal } = controllerRef.current;
 
       const eventStream = new EventSource(
         `http://localhost:3000/chat/base?msg=${input}&id=${currentId}`
@@ -84,6 +85,10 @@ function ChatWindow() {
         console.error("error", e);
         eventStream.close();
       };
+
+      signal.addEventListener("abort", () => {
+        eventStream.close();
+      });
     } catch (err: any) {
       if (err.name !== "AbortError") {
         console.error("请求失败:", err);
@@ -91,6 +96,12 @@ function ChatWindow() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    sendMessage();
   };
 
   const handleItemClick = (item) => {
@@ -110,6 +121,16 @@ function ChatWindow() {
     });
   };
 
+  const handleAbort = () => {
+    controllerRef.current?.abort();
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
   useMount(() => {
     runGetList();
   });
@@ -127,7 +148,7 @@ function ChatWindow() {
   }, [messages]); // 依赖 messages 数组变化
 
   return (
-    <div className="chat-contianer flex">
+    <div className="chat-container flex">
       <div className="chat-list h-full w-200px pt-8px px-8px">
         {listRsp?.data?.map((item, index) => (
           <div
@@ -209,14 +230,15 @@ function ChatWindow() {
             rows={5}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="请输入"
+            onKeyUp={handleKeyUp}
             style={{ marginRight: "10px", resize: "none" }}
           />
           <Space className="mt-8px">
             <Button type="primary" htmlType="submit" loading={isLoading}>
               发送
             </Button>
-            <Button>中断</Button>
+            <Button onClick={handleAbort}>中断</Button>
           </Space>
         </form>
       </div>
