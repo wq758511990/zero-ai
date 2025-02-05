@@ -1,4 +1,5 @@
-import axios from "axios";
+import { ApiResponse } from "@/types";
+import axios, { AxiosRequestConfig } from "axios";
 
 // 创建 Axios 实例
 const instance = axios.create({
@@ -34,7 +35,7 @@ instance.interceptors.response.use(
     console.log("响应拦截器 - 响应成功", response);
 
     // 例如：只返回 response.data
-    return response.data;
+    return response;
   },
   (error) => {
     // 处理响应错误
@@ -61,4 +62,10 @@ instance.interceptors.response.use(
   }
 );
 
-export default instance;
+const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
+  const response = await instance.request<ApiResponse<T>>(config);
+
+  return response.data.data;
+};
+
+export default request;

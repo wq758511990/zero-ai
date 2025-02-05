@@ -1,15 +1,18 @@
-import axiosInstance from "@/utils/http";
+import request from "@/utils/http";
 
 const chatApi = {
   getChatList: () => {
-    return axiosInstance.get("/chat/list");
+    return request<API.Chat.MessageListProps[]>({
+      url: "/chat/list",
+      method: "GET",
+    });
   },
 
   getSpecificContents: (id) => {
-    return axiosInstance.get("/chat/contentList", {
-      params: {
-        id,
-      },
+    return request<API.Chat.ContentProps[]>({
+      url: "/chat/contentList",
+      method: "GET",
+      params: { id },
     });
   },
 };

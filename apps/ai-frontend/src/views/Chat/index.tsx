@@ -14,8 +14,13 @@ type BufferType = {
   content: string | number;
 };
 
+type ContentProps = {
+  role: string;
+  content: string;
+};
+
 function ChatWindow() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<ContentProps[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const controllerRef = useRef<AbortController>();
@@ -28,8 +33,8 @@ function ChatWindow() {
 
   const { run: runGetContents } = useRequest(chatApi.getSpecificContents, {
     manual: true,
-    onSuccess: (res) => {
-      const handledData = res.data
+    onSuccess: (data) => {
+      const handledData = data
         ?.map((item) => [
           { role: "user", content: item.quest },
           { role: "assistant", content: item.content },
@@ -150,7 +155,7 @@ function ChatWindow() {
   return (
     <div className="chat-container flex">
       <div className="chat-list h-full w-200px pt-8px px-8px">
-        {listRsp?.data?.map((item, index) => (
+        {listRsp?.map((item, index) => (
           <div
             key={index}
             onClick={() => {
