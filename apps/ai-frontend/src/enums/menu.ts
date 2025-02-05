@@ -1,4 +1,5 @@
 export enum MenuEnum {
-  Index = '/',
-  Chat = '/chat',
+  Index = "/",
+  Chat = "/chat",
 }
+

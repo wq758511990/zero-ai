@@ -1,7 +1,8 @@
 import chatApi from "@/apis/chat";
+import { GPTModelEnum, GPTOptions } from "@/enums/chat";
 import { RobotOutlined, UserOutlined } from "@ant-design/icons";
 import { useMount, useRequest } from "ahooks";
-import { Avatar, Button, Input, List, Space } from "antd";
+import { Avatar, Button, Input, List, Select, Space } from "antd";
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import "./index.less";
@@ -26,6 +27,7 @@ function ChatWindow() {
   const controllerRef = useRef<AbortController>();
   const [currentId, setCurrentId] = useState(null);
   const messagesEndRef = useRef(null);
+  const [selectedModel, setSelectedModel] = useState(GPTModelEnum.GPT4oMini);
 
   const { run: runGetList, data: listRsp } = useRequest(chatApi.getChatList, {
     manual: true,
@@ -60,7 +62,7 @@ function ChatWindow() {
       const { signal } = controllerRef.current;
 
       const eventStream = new EventSource(
-        `http://localhost:3000/chat/base?msg=${input}&id=${currentId}`
+        `http://localhost:3000/chat/base?msg=${input}&id=${currentId}&model=${selectedModel}`
       );
 
       // 添加初始助手消息
@@ -240,6 +242,15 @@ function ChatWindow() {
             style={{ marginRight: "10px", resize: "none" }}
           />
           <Space className="mt-8px">
+            <Select
+              value={selectedModel}
+              onChange={setSelectedModel}
+              style={{ width: "150px" }}
+            >
+              {GPTOptions.map((item) => (
+                <Select.Option key={item.value}>{item.label}</Select.Option>
+              ))}
+            </Select>
             <Button type="primary" htmlType="submit" loading={isLoading}>
               发送
             </Button>
