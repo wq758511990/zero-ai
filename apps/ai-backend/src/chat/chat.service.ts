@@ -18,14 +18,18 @@ export class ChatService {
     });
   }
 
-  async createResponseStream(prompt: string): Promise<Observable<string>> {
+  async createResponseStream(
+    prompt: string,
+    model = 'GPT-4o-mini',
+    id?: number,
+  ): Promise<Observable<string>> {
     try {
+      const messages = id ? await this.getChatMessages(id) : [];
+      messages.push({ role: 'user', content: prompt });
       const stream = await this.openai.chat.completions.create({
         model: 'GPT-4o-mini',
-        messages: [
-          { role: 'system', content: '你是一个专业的投资助手' },
-          { role: 'user', content: prompt },
-        ],
+        // @ts-ignore
+        messages,
         stream: true,
       });
 
@@ -46,6 +50,21 @@ export class ChatService {
     } catch (error) {
       return new Observable((observer) => observer.error(error));
     }
+  }
+
+  private async getChatMessages(
+    chatId: number,
+  ): Promise<Array<{ role: string; content: string }>> {
+    const chatContents = await this.findContents(chatId);
+    return chatContents
+      .map((content) => [
+        {
+          role: 'user',
+          content: content.quest,
+        },
+        { role: 'assistant', content: content.content },
+      ])
+      ?.flat();
   }
 
   async findAllList() {
@@ -86,6 +105,9 @@ export class ChatService {
     return await this.prisma.chatContent.findMany({
       where: {
         chatId: id,
+      },
+      orderBy: {
+        createdTime: 'asc',
       },
     });
   }

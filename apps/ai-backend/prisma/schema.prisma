@@ -19,12 +19,13 @@ model User {
 }
 
 model ChatContent {
-  id      Int    @id @default(autoincrement())
-  content String @db.Text()
-  role    String @db.VarChar(50)
-  quest   String @db.Text()
-  Chat    Chat?  @relation(fields: [chatId], references: [id])
-  chatId  Int?
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text()
+  role        String   @db.VarChar(50)
+  quest       String   @db.Text()
+  Chat        Chat?    @relation(fields: [chatId], references: [id])
+  createdTime DateTime @default(now())
+  chatId      Int?
 }
 
 model Chat {

@@ -16,9 +16,10 @@ export class ChatController {
   @Sse('base')
   async chat(
     @Query('msg') msg: string,
+    @Query('model') model: string,
     @Query('id') id?: number,
   ): Promise<Observable<BufferType>> {
-    const stream$ = await this.chatService.createResponseStream(msg);
+    const stream$ = await this.chatService.createResponseStream(msg, model, id);
     // 使用一个 Subject 来缓冲流数据
     const buffer$ = new Subject<BufferType>();
 
