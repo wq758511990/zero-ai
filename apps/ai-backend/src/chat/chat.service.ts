@@ -27,7 +27,8 @@ export class ChatService {
       const messages = id ? await this.getChatMessages(id) : [];
       messages.push({ role: 'user', content: prompt });
       const stream = await this.openai.chat.completions.create({
-        model: 'GPT-4o-mini',
+        model,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         messages,
         stream: true,

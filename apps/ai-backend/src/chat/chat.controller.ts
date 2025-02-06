@@ -1,6 +1,5 @@
 import { Controller, Get, Inject, Query, Sse } from '@nestjs/common';
 import { Observable, Subject, tap } from 'rxjs';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from './chat.service';
 
 type BufferType = { type: string; content: string | number };
@@ -9,9 +8,6 @@ type BufferType = { type: string; content: string | number };
 export class ChatController {
   @Inject(ChatService)
   private chatService: ChatService;
-
-  @Inject(PrismaService)
-  private prisma: PrismaService;
 
   @Sse('base')
   async chat(
