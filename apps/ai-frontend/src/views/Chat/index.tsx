@@ -83,8 +83,8 @@ function ChatWindow() {
         } else if (jsonData.type === "session") {
           if (!currentId) {
             runGetList();
+            setCurrentId(jsonData.content);
           }
-          setCurrentId(jsonData.content);
         }
       };
 

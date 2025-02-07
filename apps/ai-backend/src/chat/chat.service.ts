@@ -1,22 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { OPENAI_CONFIGURATIONS } from '@repo/shared-constants';
 import OpenAI from 'openai';
 import { Observable } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatService {
-  private openai: OpenAI;
-
   @Inject(PrismaService)
   private prisma: PrismaService;
-
-  constructor(private configService: ConfigService) {
-    this.openai = new OpenAI({
-      baseURL: this.configService.get('baseURL'),
-      apiKey: this.configService.get('apiKey'),
-    });
-  }
 
   async createResponseStream(
     prompt: string,
@@ -24,9 +15,20 @@ export class ChatService {
     id?: number,
   ): Promise<Observable<string>> {
     try {
+      const modelConfig = OPENAI_CONFIGURATIONS.find(
+        (item) => item.model === model,
+      );
+
+      console.log('modelConfig', modelConfig);
+
+      const openai = new OpenAI({
+        baseURL: modelConfig.baseURL,
+        apiKey: modelConfig.apiKey,
+      });
+
       const messages = id ? await this.getChatMessages(id) : [];
       messages.push({ role: 'user', content: prompt });
-      const stream = await this.openai.chat.completions.create({
+      const stream = await openai.chat.completions.create({
         model,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -39,7 +41,6 @@ export class ChatService {
           try {
             for await (const chunk of stream) {
               const content = chunk.choices[0].delta?.content ?? '';
-              console.log('content', content);
               observer.next(content);
             }
             observer.complete();
