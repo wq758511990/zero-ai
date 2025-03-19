@@ -26,6 +26,7 @@ model ChatContent {
   Chat        Chat?    @relation(fields: [chatId], references: [id])
   createdTime DateTime @default(now())
   chatId      Int?
+  modelRole   String   @default("chatter") @db.VarChar(50)
 }
 
 model Chat {

@@ -1,6 +1,7 @@
 import chatApi from "@/apis/chat";
 import { GPTModelEnum, GPTOptions } from "@/enums/chat";
 import { RobotOutlined, UserOutlined } from "@ant-design/icons";
+import { ROLE_OPTIONS } from "@repo/shared-constants";
 import { useMount, useRequest } from "ahooks";
 import { Avatar, Button, Input, List, Select, Space } from "antd";
 import classNames from "classnames";
@@ -18,6 +19,7 @@ type BufferType = {
 type ContentProps = {
   role: string;
   content: string;
+  modelRole?: string;
 };
 
 function ChatWindow() {
@@ -28,6 +30,9 @@ function ChatWindow() {
   const [currentId, setCurrentId] = useState(null);
   const messagesEndRef = useRef(null);
   const [selectedModel, setSelectedModel] = useState(GPTModelEnum.GPT4oMini);
+  const [selectedRole, setSelectedRole] = useState<string>(
+    ROLE_OPTIONS?.[0]?.value
+  );
 
   const { run: runGetList, data: listRsp } = useRequest(chatApi.getChatList, {
     manual: true,
@@ -36,7 +41,7 @@ function ChatWindow() {
   const { run: runGetContents } = useRequest(chatApi.getSpecificContents, {
     manual: true,
     onSuccess: (data) => {
-      const handledData = data
+      const handledData: ContentProps[] = data
         ?.map((item) => [
           { role: "user", content: item.quest },
           { role: "assistant", content: item.content },
@@ -44,6 +49,7 @@ function ChatWindow() {
         ?.flat();
 
       setMessages(handledData);
+      setSelectedRole(data[0]?.modelRole);
     },
   });
 
@@ -62,7 +68,7 @@ function ChatWindow() {
       const { signal } = controllerRef.current;
 
       const eventStream = new EventSource(
-        `http://localhost:3000/chat/base?msg=${input}&id=${currentId}&model=${selectedModel}`
+        `http://localhost:3000/chat/base?msg=${input}&id=${currentId}&model=${selectedModel}&role=${selectedRole}`
       );
 
       // 添加初始助手消息
@@ -144,7 +150,6 @@ function ChatWindow() {
 
   // 监听 messages 变化自动滚动
   useEffect(() => {
-    console.log("message", messages[messages.length - 1]);
     // 当新消息是 AI 消息时自动滚动
     if (
       messages.length > 0 &&
@@ -249,6 +254,18 @@ function ChatWindow() {
             >
               {GPTOptions.map((item) => (
                 <Select.Option key={item.value}>{item.label}</Select.Option>
+              ))}
+            </Select>
+            <Select
+              value={selectedRole}
+              onChange={setSelectedRole}
+              disabled={messages?.length > 0}
+              style={{ width: "150px" }}
+            >
+              {ROLE_OPTIONS.map((item) => (
+                <Select.Option value={item.value} key={item.value}>
+                  {item.label}
+                </Select.Option>
               ))}
             </Select>
             <Button type="primary" htmlType="submit" loading={isLoading}>

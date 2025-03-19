@@ -9,5 +9,6 @@ declare namespace API.Chat {
     content: string;
     quest: string;
     role: string;
+    modelRole: string;
   };
 }

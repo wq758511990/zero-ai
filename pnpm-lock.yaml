@@ -47,6 +47,9 @@ importers:
       '@repo/shared-constants':
         specifier: workspace:*
         version: link:../../packages/constants
+      axios:
+        specifier: ^1.7.9
+        version: 1.7.9
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -144,6 +147,9 @@ importers:
       '@ant-design/icons':
         specifier: ^5.6.0
         version: 5.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/shared-constants':
+        specifier: workspace:^
+        version: link:../../packages/constants
       ahooks:
         specifier: ^3.8.4
         version: 3.8.4(react@18.3.1)
@@ -5384,7 +5390,7 @@ packages:
     engines: {node: '>=8'}
 
   wrap-ansi@7.0.0:
-    resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
+    resolution: {integrity: sha1-Z+FFz/UQpqaYS98RUpEdadLrnkM=}
     engines: {node: '>=10'}
 
   wrap-ansi@8.1.0:
